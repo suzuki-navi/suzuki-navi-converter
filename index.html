@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>kibela-to-hatena</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<script>
+
+$(function(){
+  $("#src").focus(function() {
+    $("#src").select();
+  });
+  $("#dst").focus(function() {
+    $("#dst").select();
+  });
+/*
+$("#convertBtn").click(function() {
+    var str = $("#src").val();
+    str = str.replace(/\$\$(.*?)_(.*?)_(.*?)\$\$/g, "$$$$$1\\_$2\\_$3$$$$");
+    str = str.replace(/\$\$(.*?)\^(.*?)\$\$/g, "$$$$$1\\^$2$$$$");
+    str = str.replace(/\$\$(.+?)\$\$/g, "[tex:$1]");
+    str = str.replace(/\n```math\n(.*?)\](.*?)\n```\n/sg, "\n```math\n$1\\]test$2\n```\n");
+    str = str.replace(/\n```math\n(.+?)\n```\n/sg, "\n<pre class=\"math\">[tex: \\displaystyle\n$1\n]</pre>\n");
+    str = str.replace(/\n```([a-z]*)\n(.+?)\n```\n/sg, "\n<pre class=\"$1\">\n$2\n</pre>\n");
+    $("#dst").val(str);
+  });
+*/
+  $("#convertBtn").click(function() {
+    var str = $("#src").val();
+
+    function replaceInline(match, p1, off, str) {
+      p1 = p1.replace(/\^/g, "\\^");
+      p1 = p1.replace(/_/g, "\\_");
+      return "[tex: \\displaystyle " + p1 + "]";
+    }
+
+    function replaceBlock(match, p1, off, str) {
+      p1 = p1.replace(/\]/g, "\\]");
+      return "<pre class=\"math\">[tex: \\displaystyle\n" + p1 + "\n]</pre>\n";
+    }
+
+    str = str.replace(/\$\$(.+?)\$\$/g, replaceInline);
+    str = str.replace(/(?<=\n)```math\n(.+?)\n```\n/sg, replaceBlock);
+    str = str.replace(/(?<=\n)```([a-z]*)\n(.+?)\n```\n/sg, "<pre class=\"$1\">\n$2\n</pre>\n");
+
+    $("#dst").val(str);
+  });
+});
+
+</script>
+
+<style>
+
+#src {
+  width: 100%;
+  height: 300px;
+}
+
+#dst {
+  width: 100%;
+  height: 300px;
+}
+
+</style>
+
+</head>
+<body>
+
+<div>
+<textarea id="src">
+</textarea>
+</div>
+
+<div>
+<input id="convertBtn" type="button" value="↓変換">
+</div>
+
+<div>
+<textarea id="dst">
+</textarea>
+</div>
+
+</body>
+</html>
