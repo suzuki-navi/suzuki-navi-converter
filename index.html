@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8"/>
 <title>kibela-to-hatena</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
@@ -13,18 +14,6 @@ $(function(){
   $("#dst").focus(function() {
     $("#dst").select();
   });
-/*
-$("#convertBtn").click(function() {
-    var str = $("#src").val();
-    str = str.replace(/\$\$(.*?)_(.*?)_(.*?)\$\$/g, "$$$$$1\\_$2\\_$3$$$$");
-    str = str.replace(/\$\$(.*?)\^(.*?)\$\$/g, "$$$$$1\\^$2$$$$");
-    str = str.replace(/\$\$(.+?)\$\$/g, "[tex:$1]");
-    str = str.replace(/\n```math\n(.*?)\](.*?)\n```\n/sg, "\n```math\n$1\\]test$2\n```\n");
-    str = str.replace(/\n```math\n(.+?)\n```\n/sg, "\n<pre class=\"math\">[tex: \\displaystyle\n$1\n]</pre>\n");
-    str = str.replace(/\n```([a-z]*)\n(.+?)\n```\n/sg, "\n<pre class=\"$1\">\n$2\n</pre>\n");
-    $("#dst").val(str);
-  });
-*/
   $("#convertBtn").click(function() {
     var str = $("#src").val();
 
