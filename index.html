@@ -21,6 +21,8 @@ $(function(){
           $("#dst").val(convertKibelaToHatena(str));
         } else if ($("#markdownToWpblog").prop("checked")) {
           $("#dst").val(convertMarkdownToWpblog(str));
+        } else if ($("#scrapboxToMarkdown").prop("checked")) {
+          $("#dst").val(convertScrapboxToMarkdown(str));
         }
     }
 
@@ -28,6 +30,101 @@ $(function(){
   $("#src").keypress(refresh);
   $("#kibelaToHatena").click(refresh);
   $("#markdownToWpblog").click(refresh);
+  $("#scrapboxToMarkdown").click(refresh);
+
+    function convertScrapboxToMarkdown(str) {
+        function replaceInline(str) {
+            function replaceBracket(match, p1, off, str) {
+                console.log(p1);
+                //if (p1.match(/\A(.+)\s+(https?:\/\/.+)\z/)) {
+                const m = p1.match(/^(.+)\s+(https.+)$/);
+                if (m) {
+                    return "[" + m[1] + "](" + m[2] + ")";
+                } else {
+                    return p1;
+                }
+            }
+            if (str == ":contents") {
+                return "[:contents]";
+            } else {
+                return str.replace(/\[([^\[\]]+)\]/sg, replaceBracket);
+            }
+        }
+        function replaceLinesList(lines) {
+            let lines2 = [];
+            let code = false;
+            for (const line of lines) {
+                if (code && line.startsWith(" ")) {
+                    lines2.push(line.substring(1));
+                    continue;
+                } else if (code) {
+                    lines2.push("```");
+                    code = false;
+                }
+                const m = line.match(/^code:(.+)$/);
+                if (m) {
+                    let lang = m[1];
+                    lines2.push("```" + lang);
+                    code = true;
+                    continue;
+                }
+                var line2;
+                var i = 0;
+                while (i < line.length) {
+                    if (!(line[i] == " " || line[i] == "\t" || line[i] == "　")) break;
+                    i++;
+                }
+                if (i == 0) {
+                    line2 = replaceInline(line.substring(i));
+                } else if (i < line.length) {
+                    line2 = "    ".repeat(i - 1) + "- " + replaceInline(line.substring(i));
+                } else {
+                    line2 = "";
+                }
+                lines2.push(line2);
+            }
+            return lines2;
+        }
+        function replaceHeader(lines) {
+            let maxHeaderLevel = 0;
+            for (const line of lines) {
+                if (line.startsWith("*")) {
+                    let i = 1;
+                    while (i < line.length) {
+                        if (line[i] != "*") break;
+                        i++;
+                    }
+                    const level = i;
+                    if (maxHeaderLevel < level) {
+                        maxHeaderLevel = level;
+                    }
+                }
+            }
+            if (maxHeaderLevel == 0) {
+                return lines;
+            }
+            let lines2 = [];
+            for (const line of lines) {
+                if (line.startsWith("*")) {
+                    let i = 1;
+                    while (i < line.length) {
+                        if (line[i] != "*") break;
+                        i++;
+                    }
+                    const level = i;
+                    const line2 = "#".repeat(maxHeaderLevel - level + 1) + line.substring(level);
+                    lines2.push(line2);
+                } else {
+                    lines2.push(line);
+                }
+            }
+            return lines2;
+        }
+        const lines = str.split("\n");
+        const lines2 = replaceLinesList(lines);
+        const lines3 = replaceHeader(lines2);
+        return lines3.join("\n");
+    }
 
   function convertKibelaToHatena(str) {
     function replaceInline(match, p1, off, str) {
@@ -214,6 +311,7 @@ $(function(){
 <div>
   <label><input type="radio" name="converter-type" id="kibelaToHatena"> kibela-to-hatena</label>
   <label><input type="radio" name="converter-type" id="markdownToWpblog"> markdown-to-wpblog</label>
+  <label><input type="radio" name="converter-type" id="scrapboxToMarkdown"> scrapbox-to-markdown</label>
 </div>
 
 <div>
