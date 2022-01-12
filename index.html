@@ -23,6 +23,9 @@ $(function(){
           $("#dst").val(convertMarkdownToWpblog(str));
         } else if ($("#scrapboxToMarkdown").prop("checked")) {
           $("#dst").val(convertScrapboxToMarkdown(str));
+        } else if ($("#zenkakuToHankaku").prop("checked")) {
+            console.log(str);
+            $("#dst").val(convertZenkakuToHankaku(str));
         }
     }
 
@@ -31,6 +34,7 @@ $(function(){
   $("#kibelaToHatena").click(refresh);
   $("#markdownToWpblog").click(refresh);
   $("#scrapboxToMarkdown").click(refresh);
+  $("#zenkakuToHankaku").click(refresh);
 
   function convertKibelaToHatena(str) {
     function replaceInline(match, p1, off, str) {
@@ -188,7 +192,7 @@ $(function(){
 
       return lines2.join("\n");
   }
-  
+
   function convertScrapboxToMarkdown(str) {
         function replaceInline(str) {
             function replaceBracket(match, p1, off, str) {
@@ -283,6 +287,15 @@ $(function(){
         return lines3.join("\n");
     }
 
+    function convertZenkakuToHankaku(str) {
+        const str2 = str.replace(/[Ａ-Ｚａ-ｚ０-９]/g, function(s) {
+            return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+        });
+        const str3 = str2.replace(/　/g, " ");
+        const str4 = str3.replace(/ >  /g, " > ");
+        return str4;
+    }
+
 });
 
 </script>
@@ -313,6 +326,7 @@ $(function(){
   <label><input type="radio" name="converter-type" id="kibelaToHatena"> kibela-to-hatena</label>
   <label><input type="radio" name="converter-type" id="markdownToWpblog"> markdown-to-wpblog</label>
   <label><input type="radio" name="converter-type" id="scrapboxToMarkdown"> scrapbox-to-markdown</label>
+  <label><input type="radio" name="converter-type" id="zenkakuToHankaku"> zenkaku-to-hankaku</label>
 </div>
 
 <div>
